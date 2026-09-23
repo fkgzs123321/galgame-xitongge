@@ -82,3 +82,11 @@
     --hot:#c8323a; --warm:#b8721f; --cool:#1f7fa3; --green:#2c8a58;
     --gold:#9a7b2e; --accent:#b8442f;
   }
+
+  #xb-root .acts { display:flex; align-items:center; gap:7px; margin-top:7px; flex-wrap:wrap; }
+  #xb-root .acts select { flex:1; min-width:120px; background:var(--panel2); color:var(--ink);
+    border:1px solid var(--line); border-radius:6px; padding:4px 6px; font-size:11.5px; font-family:inherit; }
+  #xb-root .acts button { background:var(--accent); color:#fff; border:none; border-radius:6px;
+    padding:5px 12px; font-size:11.5px; font-family:inherit; cursor:pointer; }
+  #xb-root .acts button:disabled { opacity:.45; cursor:default; }
+  #xb-root .acts .rm { flex-basis:100%; font-size:10.5px; color:var(--gold); min-height:14px; }
