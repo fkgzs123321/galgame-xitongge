@@ -315,6 +315,7 @@
     set('交涉状态.上轮判定', me.label);
     set('交涉状态.效果倍数', me.mult);
     set('交涉状态.本轮判定', 触发);
+    set('设置.骰子种子', seed);   /* 把本轮的种子记下来，供复现与审计 */
 
     var rm = document.getElementById(NS + '-rm');
     if (rm) rm.textContent = '已写入判定：' + me.label + '（P ' + me.P + ' / R ' + me.R + ' / S ' + me.S + '% / V ' + me.V + '）。' + (清醒 || '');
