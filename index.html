@@ -72,6 +72,21 @@
     border-radius:8px; padding:7px 10px; font-size:11.5px; color:var(--dim); }
   #xb-root .cmt .tn { color:var(--gold); font-size:10.5px; }
   #xb-root .foot { margin-top:10px; color:var(--dim2); font-size:10.5px; text-align:right; }
+
+  #xb-root .prof { background:var(--panel2); border:1px solid var(--line); border-radius:9px; padding:7px 9px; }
+  #xb-root .prof .prow { display:flex; align-items:baseline; gap:6px; padding:2px 0; flex-wrap:wrap; }
+  #xb-root .prof .pk { color:var(--dim2); font-size:10.5px; flex:none; }
+  #xb-root .prof .pv { font-size:11.5px; color:var(--ink); }
+  #xb-root .prof .pv.long { word-break:break-all; }
+  #xb-root .hist { margin-top:6px; font-size:10.5px; color:var(--dim2); line-height:1.75; word-break:break-all; }
+  #xb-root .hist i { font-style:normal; color:var(--dim); }
+  /* 日间主题（由 设置.主题 切换） */
+  #xb-root[data-theme="light"] {
+    --bg:#f6f7f9; --panel:#ffffff; --panel2:#f1f3f6; --line:#dfe3e9;
+    --ink:#1c2128; --dim:#5c6572; --dim2:#8a929e;
+    --hot:#c8323a; --warm:#b8721f; --cool:#1f7fa3; --green:#2c8a58;
+    --gold:#9a7b2e; --accent:#b8442f;
+  }
 </style>
 
 <div id="xb-root">
@@ -111,7 +126,19 @@
 
   <div class="hd"><b>绑定花名册</b><i>时期 · 深度 · 清醒</i></div>
   <table class="roster" id="xb-roster"></table>
-<!-- B 交涉面板 · 共识分 / 骰值对 / 判定 / 四维 / 证据链 -->
+<!-- D 她的档案 · 当前镜头对象 · 把「只写不读」的字段挂上消费者 -->
+<div class="hd"><b>她的档案</b><i id="xb-awho">—</i></div>
+  <div class="prof">
+    <div class="prow">
+      <span class="pk">时期</span><span class="pv" id="xb-pstage">—</span>
+      <span class="pk">深度</span><span class="pv" id="xb-pdepth">—</span>
+      <span class="pk">清醒频率</span><span class="pv" id="xb-pfreq">—</span>
+    </div>
+    <div class="prow"><span class="pk">最近清醒</span><span class="pv long" id="xb-plast">—</span></div>
+    <div class="prow"><span class="pk">身体</span><span class="pv long" id="xb-pbody">—</span></div>
+    <div class="prow"><span class="pk">印记</span><span class="pv long" id="xb-pmark">—</span></div>
+  </div>
+<!-- B 交涉面板 · 共识分 / 骰值对 / 判定 / 四维 / 证据链 / 回合历史 -->
 <div class="hd"><b>交涉</b><i id="xb-jt">未进行</i></div>
   <div>
     <div class="dual">
@@ -125,6 +152,7 @@
     </div>
     <div class="chips" id="xb-jattr"></div>
     <div class="evi" id="xb-jev">证据链：无</div>
+    <div class="hist" id="xb-jhist"></div>
   </div>
 <!-- C 评论条 · 倾向 / 热评 -->
 <div class="hd"><b>读者</b><i id="xb-trend">叫好</i></div>
@@ -215,6 +243,7 @@
 
   function render(v) {
     v = v || {};
+    ROOT.setAttribute('data-theme', /日|light/i.test(String((v.设置 || {}).主题 || '')) ? 'light' : 'dark');
     /* ─── A 状态栏 ─── */
     var W = v.世界 || {};
     setTxt('time', W.时间 || '—');
@@ -248,6 +277,19 @@
     setHtml('sys', sys.map(function (x) {
       return '<span' + (n(x[1], 0) ? '' : ' class="off"') + '>' + x[0] + '<b>' + n(x[1], 0) + '</b></span>';
     }).join(''));
+
+    /* ─── D 她的档案 · 当前镜头对象 ─── */
+    var AW = Book[focus] || {};
+    var awd = Math.round(n(AW.绑定深度, 0));
+    var BODY = AW.身体状态 || {};
+    var wet = Math.round(n(BODY.湿润, 0));
+    setTxt('awho', focus);
+    setTxt('pstage', AW.时期 || '当前目标');
+    setTxt('pdepth', awd + (awd >= 80 ? ' · 清醒被百分百压掉' : awd >= 40 ? ' · 半压' : ' · 可以撬'));
+    setTxt('pfreq', Math.round(n(AW.清醒频率, 0)));
+    setTxt('plast', AW.最近一次清醒 || '无');
+    setTxt('pbody', '湿润 ' + wet + (wet >= 60 ? ' · 身体已经答应' : wet >= 30 ? ' · 在洇' : ' · 还干着') + (BODY.乳尖 ? ' · 乳尖立着' : ''));
+    setTxt('pmark', AW.占有印记 || '无');
 
     var P = v.玩家 || {};
     var aw = Math.round(n(P.觉醒度, 0));
@@ -296,6 +338,9 @@
     }).join(''));
     var ev = String(P.证据链 || '').trim();
     setHtml('jev', ev ? '证据链：<b>' + esc(ev) + '</b>' : '证据链：无');
+
+    var hist = String(J.交涉历史 || '').trim();
+    setHtml('jhist', hist ? '回合历史<br><i>' + esc(hist.split('；').join('；<br>')) + '</i>' : '');
 
     /* ─── C 评论条 ─── */
     var C = v.评论 || {};
